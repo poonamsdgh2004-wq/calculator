@@ -1,0 +1,52 @@
+students = []
+
+def add():
+    students.append({
+        "ID": input("ID: "),
+        "Name": input("Name: "),
+        "Age": int(input("Age: ")),
+        "Course": input("Course: "),
+        "Marks": float(input("Marks: "))
+    })
+    print("Added.")
+
+def view():
+    for s in students:
+        print(s)
+
+def search():
+    key = input("Enter ID or Name: ")
+    found = [s for s in students if s["ID"] == key or s["Name"].lower() == key.lower()]
+    print(found if found else "Not found.")
+
+def update():
+    sid = input("Enter ID to update: ")
+    for s in students:
+        if s["ID"] == sid:
+            s["Name"] = input("Name: ")
+            s["Age"] = int(input("Age: "))
+            s["Course"] = input("Course: ")
+            s["Marks"] = float(input("Marks: "))
+            print("Updated.")
+            return
+    print("Not found.")
+
+def delete():
+    sid = input("Enter ID to delete: ")
+    for i, s in enumerate(students):
+        if s["ID"] == sid:
+            students.pop(i)
+            print("Deleted.")
+            return
+    print("Not found.")
+
+while True:
+    print("\n1.Add 2.View 3.Search 4.Update 5.Delete 6.Exit")
+    ch = input("Choice: ")
+    if ch == "1": add()
+    elif ch == "2": view()
+    elif ch == "3": search()
+    elif ch == "4": update()
+    elif ch == "5": delete()
+    elif ch == "6": break
+    else: print("Invalid")
