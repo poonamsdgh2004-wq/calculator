@@ -1,0 +1,614 @@
+# ============================================================
+# E-COMMERCE SALES ANALYSIS - DAY 8
+# Python + Pandas | Google Colab
+# ============================================================
+
+import pandas as pd
+import numpy as np
+
+# ------------------------------------------------------------
+# 1. LOAD DATASET
+# ------------------------------------------------------------
+
+# Upload your CSV file in Colab first
+from google.colab import files
+uploaded = files.upload()
+
+# Get the uploaded file name automatically
+file_name = list(uploaded.keys())[0]
+
+# Load CSV into DataFrame
+df = pd.read_csv(file_name)
+
+print("Dataset loaded successfully!")
+print("File Name:", file_name)
+
+# ------------------------------------------------------------
+# 2. BASIC DATASET INFORMATION
+# ------------------------------------------------------------
+
+print("\n========== FIRST 5 ROWS ==========")
+print(df.head())
+
+print("\n========== LAST 5 ROWS ==========")
+print(df.tail())
+
+print("\n========== DATASET SHAPE ==========")
+print("Rows:", df.shape[0])
+print("Columns:", df.shape[1])
+
+print("\n========== COLUMN NAMES ==========")
+print(df.columns.tolist())
+
+print("\n========== DATA TYPES ==========")
+print(df.dtypes)
+
+print("\n========== DATASET INFORMATION ==========")
+df.info()
+
+print("\n========== MISSING VALUES ==========")
+print(df.isnull().sum())
+
+print("\n========== DUPLICATE ROWS ==========")
+print(df.duplicated().sum())
+
+# ------------------------------------------------------------
+# 3. CLEAN COLUMN NAMES
+# ------------------------------------------------------------
+
+df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+
+print("\n========== CLEANED COLUMN NAMES ==========")
+print(df.columns.tolist())
+
+# ------------------------------------------------------------
+# 4. BASIC STATISTICS
+# ------------------------------------------------------------
+
+print("\n========== DESCRIPTIVE STATISTICS ==========")
+print(df.describe(include="all"))
+
+# ------------------------------------------------------------
+# 5. DISPLAY DATA USING SELECTION
+# ------------------------------------------------------------
+
+print("\n========== SELECTING FIRST 10 ROWS ==========")
+print(df.head(10))
+
+# Select first column
+print("\n========== FIRST COLUMN ==========")
+print(df.iloc[:, 0].head())
+
+# Select multiple columns if they exist
+possible_columns = [
+    "order_id", "product", "category", "city",
+    "payment_method", "quantity", "sales"
+]
+
+available_columns = [col for col in possible_columns if col in df.columns]
+
+print("\n========== SELECTED COLUMNS ==========")
+print(df[available_columns].head())
+
+# ------------------------------------------------------------
+# 6. CONVERT IMPORTANT NUMERIC COLUMNS
+# ------------------------------------------------------------
+
+for col in ["sales", "quantity", "price", "amount"]:
+    if col in df.columns:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+
+# ------------------------------------------------------------
+# 7. HANDLE MISSING VALUES
+# ------------------------------------------------------------
+
+print("\n========== MISSING VALUES BEFORE CLEANING ==========")
+print(df.isnull().sum())
+
+# Fill numeric missing values with 0
+numeric_columns = df.select_dtypes(include=np.number).columns
+
+for col in numeric_columns:
+    df[col] = df[col].fillna(0)
+
+# Fill text missing values with "Unknown"
+text_columns = df.select_dtypes(include="object").columns
+
+for col in text_columns:
+    df[col] = df[col].fillna("Unknown")
+
+print("\n========== MISSING VALUES AFTER CLEANING ==========")
+print(df.isnull().sum())
+
+# ------------------------------------------------------------
+# 8. IDENTIFY SALES COLUMN
+# ------------------------------------------------------------
+
+# Common possible names for sales column
+sales_candidates = ["sales", "sale", "amount", "total_sales", "revenue"]
+
+sales_col = None
+
+for col in sales_candidates:
+    if col in df.columns:
+        sales_col = col
+        break
+
+if sales_col is None:
+    print("\nSales column was not automatically identified.")
+    print("Available columns:", df.columns.tolist())
+else:
+    print("\nSales column:", sales_col)
+
+# ------------------------------------------------------------
+# 9. TOTAL, AVERAGE, HIGHEST AND LOWEST SALES
+# ------------------------------------------------------------
+
+if sales_col:
+    total_sales = df[sales_col].sum()
+    average_sales = df[sales_col].mean()
+    highest_sales = df[sales_col].max()
+    lowest_sales = df[sales_col].min()
+
+    print("\n========== SALES STATISTICS ==========")
+    print("Total Sales   :", round(total_sales, 2))
+    print("Average Sales :", round(average_sales, 2))
+    print("Highest Sales :", round(highest_sales, 2))
+    print("Lowest Sales  :", round(lowest_sales, 2))
+
+# ------------------------------------------------------------
+# 10. TOTAL QUANTITY SOLD
+# ------------------------------------------------------------
+
+if "quantity" in df.columns:
+    total_quantity = df["quantity"].sum()
+    average_quantity = df["quantity"].mean()
+
+    print("\n========== QUANTITY STATISTICS ==========")
+    print("Total Quantity Sold   :", total_quantity)
+    print("Average Quantity/Order:", round(average_quantity, 2))
+
+# ------------------------------------------------------------
+# 11. NUMBER OF ORDERS
+# ------------------------------------------------------------
+
+if "order_id" in df.columns:
+    number_of_orders = df["order_id"].nunique()
+else:
+    number_of_orders = len(df)
+
+print("\n========== ORDER STATISTICS ==========")
+print("Number of Orders:", number_of_orders)
+
+# ------------------------------------------------------------
+# 12. FILTERING DATA
+# ------------------------------------------------------------
+
+if sales_col:
+
+    print("\n========== ORDERS WITH SALES ABOVE AVERAGE ==========")
+
+    high_sales_orders = df[df[sales_col] > df[sales_col].mean()]
+    print(high_sales_orders.head(10))
+
+    print("\nNumber of orders above average sales:",
+          len(high_sales_orders))
+
+    print("\n========== TOP 10 HIGHEST SALES ORDERS ==========")
+
+    top_orders = df.sort_values(
+        by=sales_col,
+        ascending=False
+    ).head(10)
+
+    print(top_orders)
+
+# ------------------------------------------------------------
+# 13. SORTING DATA
+# ------------------------------------------------------------
+
+if sales_col:
+
+    print("\n========== SORTED BY SALES - HIGHEST TO LOWEST ==========")
+
+    sorted_sales = df.sort_values(
+        by=sales_col,
+        ascending=False
+    )
+
+    print(sorted_sales.head(10))
+
+    print("\n========== SORTED BY SALES - LOWEST TO HIGHEST ==========")
+
+    print(
+        df.sort_values(
+            by=sales_col,
+            ascending=True
+        ).head(10)
+    )
+
+# ------------------------------------------------------------
+# 14. CATEGORY-WISE ANALYSIS
+# ------------------------------------------------------------
+
+if "category" in df.columns and sales_col:
+
+    category_analysis = df.groupby("category").agg(
+        total_sales=(sales_col, "sum"),
+        average_sales=(sales_col, "mean"),
+        highest_sales=(sales_col, "max"),
+        lowest_sales=(sales_col, "min"),
+        number_of_orders=(sales_col, "count")
+    ).sort_values(
+        by="total_sales",
+        ascending=False
+    )
+
+    if "quantity" in df.columns:
+        quantity_category = df.groupby("category")["quantity"].sum()
+        category_analysis["total_quantity"] = quantity_category
+
+    print("\n========== CATEGORY-WISE SALES ANALYSIS ==========")
+    print(category_analysis)
+
+    print("\n========== TOP PERFORMING CATEGORY ==========")
+    print(category_analysis.head(1))
+
+# ------------------------------------------------------------
+# 15. CITY-WISE ANALYSIS
+# ------------------------------------------------------------
+
+if "city" in df.columns and sales_col:
+
+    city_analysis = df.groupby("city").agg(
+        total_sales=(sales_col, "sum"),
+        average_sales=(sales_col, "mean"),
+        highest_sales=(sales_col, "max"),
+        number_of_orders=(sales_col, "count")
+    ).sort_values(
+        by="total_sales",
+        ascending=False
+    )
+
+    if "quantity" in df.columns:
+        city_analysis["total_quantity"] = (
+            df.groupby("city")["quantity"].sum()
+        )
+
+    print("\n========== CITY-WISE SALES ANALYSIS ==========")
+    print(city_analysis)
+
+    print("\n========== TOP 10 CITIES BY SALES ==========")
+    print(city_analysis.head(10))
+
+# ------------------------------------------------------------
+# 16. PRODUCT-WISE ANALYSIS
+# ------------------------------------------------------------
+
+# Check possible product column names
+product_col = None
+
+for col in ["product", "product_name", "item"]:
+    if col in df.columns:
+        product_col = col
+        break
+
+if product_col and sales_col:
+
+    product_analysis = df.groupby(product_col).agg(
+        total_sales=(sales_col, "sum"),
+        average_sales=(sales_col, "mean"),
+        highest_sales=(sales_col, "max"),
+        number_of_orders=(sales_col, "count")
+    ).sort_values(
+        by="total_sales",
+        ascending=False
+    )
+
+    if "quantity" in df.columns:
+        product_analysis["total_quantity"] = (
+            df.groupby(product_col)["quantity"].sum()
+        )
+
+    print("\n========== PRODUCT-WISE SALES ANALYSIS ==========")
+    print(product_analysis)
+
+    print("\n========== TOP 10 PRODUCTS ==========")
+    print(product_analysis.head(10))
+
+    print("\n========== LOWEST 10 PRODUCTS ==========")
+    print(product_analysis.tail(10))
+
+# ------------------------------------------------------------
+# 17. PAYMENT METHOD ANALYSIS
+# ------------------------------------------------------------
+
+if "payment_method" in df.columns and sales_col:
+
+    payment_analysis = df.groupby("payment_method").agg(
+        total_sales=(sales_col, "sum"),
+        average_sales=(sales_col, "mean"),
+        number_of_orders=(sales_col, "count")
+    ).sort_values(
+        by="total_sales",
+        ascending=False
+    )
+
+    if "quantity" in df.columns:
+        payment_analysis["total_quantity"] = (
+            df.groupby("payment_method")["quantity"].sum()
+        )
+
+    print("\n========== PAYMENT METHOD ANALYSIS ==========")
+    print(payment_analysis)
+
+# ------------------------------------------------------------
+# 18. MULTI-LEVEL GROUPBY
+# ------------------------------------------------------------
+
+if (
+    "category" in df.columns
+    and "city" in df.columns
+    and sales_col
+):
+
+    category_city = df.groupby(
+        ["category", "city"]
+    ).agg(
+        total_sales=(sales_col, "sum"),
+        average_sales=(sales_col, "mean"),
+        number_of_orders=(sales_col, "count")
+    ).sort_values(
+        by="total_sales",
+        ascending=False
+    )
+
+    print("\n========== CATEGORY + CITY ANALYSIS ==========")
+    print(category_city.head(20))
+
+# ------------------------------------------------------------
+# 19. CATEGORY + PAYMENT METHOD ANALYSIS
+# ------------------------------------------------------------
+
+if (
+    "category" in df.columns
+    and "payment_method" in df.columns
+    and sales_col
+):
+
+    category_payment = df.groupby(
+        ["category", "payment_method"]
+    ).agg(
+        total_sales=(sales_col, "sum"),
+        average_sales=(sales_col, "mean"),
+        number_of_orders=(sales_col, "count")
+    ).sort_values(
+        by="total_sales",
+        ascending=False
+    )
+
+    print("\n========== CATEGORY + PAYMENT METHOD ANALYSIS ==========")
+    print(category_payment)
+
+# ------------------------------------------------------------
+# 20. SPECIFIC FILTERS
+# ------------------------------------------------------------
+
+if sales_col:
+
+    # Orders greater than 1000
+    print("\n========== ORDERS WITH SALES > 1000 ==========")
+    print(df[df[sales_col] > 1000].head(20))
+
+    # Orders between 500 and 1000
+    print("\n========== ORDERS WITH SALES BETWEEN 500 AND 1000 ==========")
+    print(
+        df[
+            (df[sales_col] >= 500) &
+            (df[sales_col] <= 1000)
+        ].head(20)
+    )
+
+if "quantity" in df.columns:
+
+    print("\n========== ORDERS WITH QUANTITY >= 5 ==========")
+    print(df[df["quantity"] >= 5].head(20))
+
+# ------------------------------------------------------------
+# 21. TOP 10 ORDERS
+# ------------------------------------------------------------
+
+if sales_col:
+
+    top_10_orders = df.nlargest(10, sales_col)
+
+    print("\n========== TOP 10 ORDERS BY SALES ==========")
+    print(top_10_orders)
+
+# ------------------------------------------------------------
+# 22. LOWEST 10 ORDERS
+# ------------------------------------------------------------
+
+if sales_col:
+
+    lowest_10_orders = df.nsmallest(10, sales_col)
+
+    print("\n========== LOWEST 10 ORDERS BY SALES ==========")
+    print(lowest_10_orders)
+
+# ------------------------------------------------------------
+# 23. MODE OF PAYMENT
+# ------------------------------------------------------------
+
+if "payment_method" in df.columns:
+
+    print("\n========== MOST USED PAYMENT METHOD ==========")
+
+    most_used_payment = df["payment_method"].value_counts()
+
+    print(most_used_payment)
+
+    print(
+        "\nMost Used Payment Method:",
+        most_used_payment.idxmax()
+    )
+
+# ------------------------------------------------------------
+# 24. MOST COMMON CATEGORY
+# ------------------------------------------------------------
+
+if "category" in df.columns:
+
+    category_count = df["category"].value_counts()
+
+    print("\n========== NUMBER OF ORDERS BY CATEGORY ==========")
+    print(category_count)
+
+    print(
+        "\nMost Frequently Ordered Category:",
+        category_count.idxmax()
+    )
+
+# ------------------------------------------------------------
+# 25. MOST COMMON CITY
+# ------------------------------------------------------------
+
+if "city" in df.columns:
+
+    city_count = df["city"].value_counts()
+
+    print("\n========== NUMBER OF ORDERS BY CITY ==========")
+    print(city_count.head(10))
+
+    print(
+        "\nCity With Most Orders:",
+        city_count.idxmax()
+    )
+
+# ------------------------------------------------------------
+# 26. FINAL SUMMARY
+# ------------------------------------------------------------
+
+print("\n")
+print("=" * 60)
+print("FINAL E-COMMERCE SALES SUMMARY")
+print("=" * 60)
+
+if sales_col:
+    print("Total Sales:", round(df[sales_col].sum(), 2))
+    print("Average Sales:", round(df[sales_col].mean(), 2))
+    print("Highest Sale:", round(df[sales_col].max(), 2))
+    print("Lowest Sale:", round(df[sales_col].min(), 2))
+
+if "quantity" in df.columns:
+    print("Total Quantity Sold:", df["quantity"].sum())
+
+if "order_id" in df.columns:
+    print("Total Unique Orders:", df["order_id"].nunique())
+else:
+    print("Total Orders:", len(df))
+
+if "category" in df.columns and sales_col:
+    best_category = (
+        df.groupby("category")[sales_col]
+        .sum()
+        .idxmax()
+    )
+    print("Top Category:", best_category)
+
+if product_col and sales_col:
+    best_product = (
+        df.groupby(product_col)[sales_col]
+        .sum()
+        .idxmax()
+    )
+    print("Top Product:", best_product)
+
+if "city" in df.columns and sales_col:
+    best_city = (
+        df.groupby("city")[sales_col]
+        .sum()
+        .idxmax()
+    )
+    print("Top City:", best_city)
+
+if "payment_method" in df.columns:
+    popular_payment = df["payment_method"].value_counts().idxmax()
+    print("Most Used Payment Method:", popular_payment)
+
+# ------------------------------------------------------------
+# 27. AUTOMATIC OBSERVATIONS
+# ------------------------------------------------------------
+
+print("\n")
+print("=" * 60)
+print("MEANINGFUL OBSERVATIONS")
+print("=" * 60)
+
+if sales_col:
+    print(
+        "1. The total sales generated by the business are:",
+        round(df[sales_col].sum(), 2)
+    )
+
+    print(
+        "2. The average sales per order are:",
+        round(df[sales_col].mean(), 2)
+    )
+
+if "quantity" in df.columns:
+    print(
+        "3. The total quantity of products sold is:",
+        df["quantity"].sum()
+    )
+
+if "category" in df.columns and sales_col:
+
+    category_sales = df.groupby("category")[sales_col].sum()
+
+    print(
+        "4. The highest-performing category is:",
+        category_sales.idxmax(),
+        "with sales of",
+        round(category_sales.max(), 2)
+    )
+
+    print(
+        "5. The lowest-performing category is:",
+        category_sales.idxmin(),
+        "with sales of",
+        round(category_sales.min(), 2)
+    )
+
+if product_col and sales_col:
+
+    product_sales = df.groupby(product_col)[sales_col].sum()
+
+    print(
+        "6. The top-performing product is:",
+        product_sales.idxmax(),
+        "with total sales of",
+        round(product_sales.max(), 2)
+    )
+
+if "city" in df.columns and sales_col:
+
+    city_sales = df.groupby("city")[sales_col].sum()
+
+    print(
+        "7. The city generating the highest sales is:",
+        city_sales.idxmax(),
+        "with sales of",
+        round(city_sales.max(), 2)
+    )
+
+if "payment_method" in df.columns:
+
+    payment_counts = df["payment_method"].value_counts()
+
+    print(
+        "8. The most frequently used payment method is:",
+        payment_counts.idxmax()
+    )
+
+print("\nAnalysis completed successfully!")
