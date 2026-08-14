@@ -1,0 +1,205 @@
+# Day 9 Assignment: Processed E-commerce Dataset
+
+import pandas as pd
+
+# --------------------------------------------------
+# 1. Load the CSV datasets
+# --------------------------------------------------
+
+orders = pd.read_csv("Orders.csv")
+customers = pd.read_csv("Customers.csv")
+products = pd.read_csv("Products.csv")
+
+print("Orders:")
+print(orders.head())
+
+print("\nCustomers:")
+print(customers.head())
+
+print("\nProducts:")
+print(products.head())
+
+
+# --------------------------------------------------
+# 2. Check the structure of the datasets
+# --------------------------------------------------
+
+print("\nOrders Columns:")
+print(orders.columns)
+
+print("\nCustomers Columns:")
+print(customers.columns)
+
+print("\nProducts Columns:")
+print(products.columns)
+
+
+# --------------------------------------------------
+# 3. Clean column names
+# --------------------------------------------------
+
+orders.columns = orders.columns.str.strip()
+customers.columns = customers.columns.str.strip()
+products.columns = products.columns.str.strip()
+
+
+# --------------------------------------------------
+# 4. Convert Order Date to DateTime
+# --------------------------------------------------
+
+orders["Order Date"] = pd.to_datetime(
+    orders["Order Date"],
+    errors="coerce"
+)
+
+
+# --------------------------------------------------
+# 5. Extract DateTime information
+# --------------------------------------------------
+
+orders["Order Year"] = orders["Order Date"].dt.year
+orders["Order Month"] = orders["Order Date"].dt.month
+orders["Order Month Name"] = orders["Order Date"].dt.month_name()
+orders["Order Day"] = orders["Order Date"].dt.day
+orders["Order Day Name"] = orders["Order Date"].dt.day_name()
+
+
+# --------------------------------------------------
+# 6. Merge Orders with Customers
+# --------------------------------------------------
+# Change "Customer ID" if your CSV uses a different
+# column name.
+
+processed = pd.merge(
+    orders,
+    customers,
+    on="Customer ID",
+    how="left"
+)
+
+
+# --------------------------------------------------
+# 7. Merge the result with Products
+# --------------------------------------------------
+# Change "Product ID" if your CSV uses a different
+# column name.
+
+processed = pd.merge(
+    processed,
+    products,
+    on="Product ID",
+    how="left"
+)
+
+
+# --------------------------------------------------
+# 8. Use apply() to create/transform useful columns
+# --------------------------------------------------
+
+# Example: Create a customer name column
+if "First Name" in processed.columns and "Last Name" in processed.columns:
+    processed["Customer Name"] = processed.apply(
+        lambda row: str(row["First Name"]) + " " + str(row["Last Name"]),
+        axis=1
+    )
+
+# Example: Create Order Value if Quantity and Price exist
+if "Quantity" in processed.columns and "Price" in processed.columns:
+    processed["Order Value"] = processed.apply(
+        lambda row: row["Quantity"] * row["Price"],
+        axis=1
+    )
+
+# Example: Create an order size/category
+if "Order Value" in processed.columns:
+    processed["Order Category"] = processed["Order Value"].apply(
+        lambda x: "High Value" if x >= 1000
+        else ("Medium Value" if x >= 500 else "Low Value")
+    )
+
+
+# --------------------------------------------------
+# 9. Demonstrate concat()
+# --------------------------------------------------
+# concat() combines DataFrames vertically.
+# Here we split Orders into two parts and combine them.
+
+orders_part1 = orders.iloc[:len(orders)//2]
+orders_part2 = orders.iloc[len(orders)//2:]
+
+orders_combined = pd.concat(
+    [orders_part1, orders_part2],
+    axis=0,
+    ignore_index=True
+)
+
+print("\nOriginal Orders Rows:", len(orders))
+print("After concat Rows:", len(orders_combined))
+
+
+# --------------------------------------------------
+# 10. Handle missing values
+# --------------------------------------------------
+
+# Display missing values
+print("\nMissing Values:")
+print(processed.isnull().sum())
+
+# Fill numerical missing values with 0
+numeric_columns = processed.select_dtypes(
+    include="number"
+).columns
+
+processed[numeric_columns] = processed[numeric_columns].fillna(0)
+
+# Fill text missing values
+text_columns = processed.select_dtypes(
+    include="object"
+).columns
+
+processed[text_columns] = processed[text_columns].fillna("Unknown")
+
+
+# --------------------------------------------------
+# 11. Remove duplicate rows
+# --------------------------------------------------
+
+processed = processed.drop_duplicates()
+
+
+# --------------------------------------------------
+# 12. Organize the DataFrame
+# --------------------------------------------------
+
+processed = processed.sort_values(
+    by="Order Date"
+).reset_index(drop=True)
+
+
+# --------------------------------------------------
+# 13. Display final processed dataset
+# --------------------------------------------------
+
+print("\nFinal Processed Dataset:")
+print(processed.head())
+
+print("\nDataset Shape:")
+print(processed.shape)
+
+print("\nFinal Columns:")
+print(processed.columns.tolist())
+
+
+# --------------------------------------------------
+# 14. Export final processed dataset
+# --------------------------------------------------
+
+processed.to_csv(
+    "Processed_Ecommerce_Dataset.csv",
+    index=False
+)
+
+print(
+    "\nProcessed dataset successfully saved as "
+    "'Processed_Ecommerce_Dataset.csv'"
+)
