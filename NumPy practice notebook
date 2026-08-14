@@ -1,0 +1,423 @@
+# ================================================================
+# NUMPY PRACTICE NOTEBOOK - DAY 6
+# Numerical Data Analysis using NumPy
+# ================================================================
+
+import numpy as np
+
+print("=" * 60)
+print("NUMPY PRACTICE NOTEBOOK - DAY 6")
+print("=" * 60)
+
+# ------------------------------------------------
+# 1. CREATE 1D ARRAY
+# ------------------------------------------------
+print("\n1. CREATING 1D ARRAY")
+print("-" * 40)
+
+arr_1d = np.array([10, 20, 30, 40, 50])
+
+print("1D Array:", arr_1d)
+
+
+# ------------------------------------------------
+# 2. CREATE 2D ARRAY
+# ------------------------------------------------
+print("\n2. CREATING 2D ARRAY")
+print("-" * 40)
+
+arr_2d = np.array([
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+])
+
+print("2D Array:")
+print(arr_2d)
+
+
+# ------------------------------------------------
+# 3. CREATE 3D ARRAY
+# ------------------------------------------------
+print("\n3. CREATING 3D ARRAY")
+print("-" * 40)
+
+arr_3d = np.array([
+    [[1, 2, 3],
+     [4, 5, 6]],
+
+    [[7, 8, 9],
+     [10, 11, 12]]
+])
+
+print("3D Array:")
+print(arr_3d)
+
+
+# ------------------------------------------------
+# 4. CHECK DIMENSIONS, SHAPE AND DATA TYPE
+# ------------------------------------------------
+print("\n4. DIMENSIONS, SHAPE AND DATA TYPE")
+print("-" * 40)
+
+print("1D Array:")
+print("Dimensions:", arr_1d.ndim)
+print("Shape:", arr_1d.shape)
+print("Data Type:", arr_1d.dtype)
+
+print("\n2D Array:")
+print("Dimensions:", arr_2d.ndim)
+print("Shape:", arr_2d.shape)
+print("Data Type:", arr_2d.dtype)
+
+print("\n3D Array:")
+print("Dimensions:", arr_3d.ndim)
+print("Shape:", arr_3d.shape)
+print("Data Type:", arr_3d.dtype)
+
+
+# ------------------------------------------------
+# 5. INDEXING
+# ------------------------------------------------
+print("\n5. INDEXING")
+print("-" * 40)
+
+print("First element of 1D array:", arr_1d[0])
+print("Third element of 1D array:", arr_1d[2])
+
+print("Element from 2D array [0,1]:", arr_2d[0, 1])
+print("Element from 2D array [2,2]:", arr_2d[2, 2])
+
+print("Element from 3D array [1,0,2]:", arr_3d[1, 0, 2])
+
+
+# ------------------------------------------------
+# 6. SLICING
+# ------------------------------------------------
+print("\n6. SLICING")
+print("-" * 40)
+
+print("Original 1D array:", arr_1d)
+print("First 3 elements:", arr_1d[:3])
+print("Last 2 elements:", arr_1d[-2:])
+print("Elements from index 1 to 3:", arr_1d[1:4])
+
+print("\nFirst 2 rows of 2D array:")
+print(arr_2d[:2])
+
+print("\nFirst 2 columns of 2D array:")
+print(arr_2d[:, :2])
+
+
+# ------------------------------------------------
+# 7. RESHAPING ARRAYS
+# ------------------------------------------------
+print("\n7. RESHAPING ARRAYS")
+print("-" * 40)
+
+numbers = np.arange(1, 13)
+
+print("Original Array:")
+print(numbers)
+
+reshaped = numbers.reshape(3, 4)
+
+print("\nReshaped into 3 x 4:")
+print(reshaped)
+
+
+# ------------------------------------------------
+# 8. ZEROS()
+# ------------------------------------------------
+print("\n8. ZEROS ARRAY")
+print("-" * 40)
+
+zeros_array = np.zeros((3, 4))
+
+print(zeros_array)
+
+
+# ------------------------------------------------
+# 9. ONES()
+# ------------------------------------------------
+print("\n9. ONES ARRAY")
+print("-" * 40)
+
+ones_array = np.ones((3, 4))
+
+print(ones_array)
+
+
+# ------------------------------------------------
+# 10. ARANGE()
+# ------------------------------------------------
+print("\n10. ARANGE()")
+print("-" * 40)
+
+arr_range = np.arange(1, 11)
+
+print("Numbers from 1 to 10:")
+print(arr_range)
+
+even_numbers = np.arange(2, 21, 2)
+
+print("Even numbers from 2 to 20:")
+print(even_numbers)
+
+
+# ------------------------------------------------
+# 11. LINSPACE()
+# ------------------------------------------------
+print("\n11. LINSPACE()")
+print("-" * 40)
+
+arr_linspace = np.linspace(0, 10, 5)
+
+print("5 equally spaced numbers between 0 and 10:")
+print(arr_linspace)
+
+
+# ------------------------------------------------
+# 12. MATHEMATICAL OPERATIONS
+# ------------------------------------------------
+print("\n12. MATHEMATICAL OPERATIONS")
+print("-" * 40)
+
+a = np.array([10, 20, 30, 40, 50])
+b = np.array([1, 2, 3, 4, 5])
+
+print("Array A:", a)
+print("Array B:", b)
+
+print("\nAddition:", a + b)
+print("Subtraction:", a - b)
+print("Multiplication:", a * b)
+print("Division:", a / b)
+print("Power:", a ** 2)
+
+
+# ------------------------------------------------
+# 13. VECTORIZED OPERATIONS
+# ------------------------------------------------
+print("\n13. VECTORIZED OPERATIONS")
+print("-" * 40)
+
+numbers = np.array([1, 2, 3, 4, 5])
+
+print("Original:", numbers)
+print("Multiply by 10:", numbers * 10)
+print("Add 5:", numbers + 5)
+print("Subtract 2:", numbers - 2)
+print("Square:", numbers ** 2)
+print("Square Root:", np.sqrt(numbers))
+
+
+# ------------------------------------------------
+# 14. BOOLEAN MASKING
+# ------------------------------------------------
+print("\n14. BOOLEAN MASKING")
+print("-" * 40)
+
+marks = np.array([35, 67, 89, 45, 92, 76, 30, 88])
+
+print("Marks:", marks)
+
+condition = marks >= 50
+
+print("\nBoolean Mask:")
+print(condition)
+
+print("\nPassing Marks:")
+print(marks[marks >= 50])
+
+print("\nFailing Marks:")
+print(marks[marks < 50])
+
+
+# ------------------------------------------------
+# 15. BOOLEAN MASKING WITH MULTIPLE CONDITIONS
+# ------------------------------------------------
+print("\n15. MULTIPLE BOOLEAN CONDITIONS")
+print("-" * 40)
+
+selected_marks = marks[(marks >= 50) & (marks <= 80)]
+
+print("Marks between 50 and 80:")
+print(selected_marks)
+
+
+# ------------------------------------------------
+# 16. BROADCASTING
+# ------------------------------------------------
+print("\n16. BROADCASTING")
+print("-" * 40)
+
+matrix = np.array([
+    [10, 20, 30],
+    [40, 50, 60],
+    [70, 80, 90]
+])
+
+values = np.array([1, 2, 3])
+
+print("Original Matrix:")
+print(matrix)
+
+print("\nArray:")
+print(values)
+
+print("\nAfter Broadcasting:")
+print(matrix + values)
+
+
+# ------------------------------------------------
+# 17. BROADCASTING WITH SCALAR
+# ------------------------------------------------
+print("\n17. BROADCASTING WITH SCALAR")
+print("-" * 40)
+
+print("Matrix + 10:")
+print(matrix + 10)
+
+print("\nMatrix * 2:")
+print(matrix * 2)
+
+
+# ------------------------------------------------
+# 18. AGGREGATE FUNCTIONS
+# ------------------------------------------------
+print("\n18. AGGREGATE FUNCTIONS")
+print("-" * 40)
+
+data = np.array([10, 20, 30, 40, 50])
+
+print("Data:", data)
+
+print("Sum:", np.sum(data))
+print("Mean:", np.mean(data))
+print("Minimum:", np.min(data))
+print("Maximum:", np.max(data))
+print("Median:", np.median(data))
+
+
+# ------------------------------------------------
+# 19. AGGREGATE FUNCTIONS ON 2D ARRAY
+# ------------------------------------------------
+print("\n19. AGGREGATE FUNCTIONS ON 2D ARRAY")
+print("-" * 40)
+
+data_2d = np.array([
+    [10, 20, 30],
+    [40, 50, 60],
+    [70, 80, 90]
+])
+
+print("2D Array:")
+print(data_2d)
+
+print("\nTotal Sum:", np.sum(data_2d))
+print("Mean:", np.mean(data_2d))
+print("Minimum:", np.min(data_2d))
+print("Maximum:", np.max(data_2d))
+print("Median:", np.median(data_2d))
+
+print("\nSum of Each Row:")
+print(np.sum(data_2d, axis=1))
+
+print("\nSum of Each Column:")
+print(np.sum(data_2d, axis=0))
+
+
+# ------------------------------------------------
+# 20. PRACTICAL NUMERICAL DATA ANALYSIS
+# ------------------------------------------------
+print("\n20. PRACTICAL DATA ANALYSIS")
+print("-" * 40)
+
+# Student marks:
+# Columns = Math, Science, English
+student_marks = np.array([
+    [85, 90, 78],
+    [72, 88, 91],
+    [95, 89, 94],
+    [60, 70, 65],
+    [80, 85, 88]
+])
+
+print("Student Marks:")
+print(student_marks)
+
+# Average of each student
+student_average = np.mean(student_marks, axis=1)
+
+print("\nAverage Marks of Each Student:")
+print(student_average)
+
+# Average of each subject
+subject_average = np.mean(student_marks, axis=0)
+
+print("\nAverage Marks of Each Subject:")
+print(subject_average)
+
+# Highest mark
+print("\nHighest Mark:", np.max(student_marks))
+
+# Lowest mark
+print("Lowest Mark:", np.min(student_marks))
+
+# Overall average
+print("Overall Average:", np.mean(student_marks))
+
+# Median
+print("Overall Median:", np.median(student_marks))
+
+# Students with average above 80
+print("\nStudents with Average Above 80:")
+print(student_average[student_average > 80])
+
+
+# ------------------------------------------------
+# 21. OTHER COMMON NUMPY FUNCTIONS
+# ------------------------------------------------
+print("\n21. OTHER COMMON NUMPY FUNCTIONS")
+print("-" * 40)
+
+data = np.array([10, 20, 30, 40, 50])
+
+print("Data:", data)
+print("Standard Deviation:", np.std(data))
+print("Variance:", np.var(data))
+print("Cumulative Sum:", np.cumsum(data))
+
+
+# ------------------------------------------------
+# 22. FINAL SUMMARY
+# ------------------------------------------------
+print("\n" + "=" * 60)
+print("NUMPY DAY 6 ASSIGNMENT COMPLETED")
+print("=" * 60)
+
+print("""
+Topics Covered:
+1. 1D Arrays
+2. 2D Arrays
+3. 3D Arrays
+4. Dimensions, Shape and Data Types
+5. Indexing
+6. Slicing
+7. Reshaping
+8. zeros()
+9. ones()
+10. arange()
+11. linspace()
+12. Mathematical Operations
+13. Vectorized Operations
+14. Boolean Masking
+15. Broadcasting
+16. sum()
+17. mean()
+18. min()
+19. max()
+20. median()
+21. Practical Numerical Data Analysis
+""")
